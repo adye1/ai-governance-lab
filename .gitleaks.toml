@@ -1,0 +1,20 @@
+# gitleaks config for the AI Governance & Security Lab.
+# The lab intentionally contains synthetic test "secrets" as fixtures; those are
+# kept out of git by .gitignore. This config is a second layer that allowlists
+# clearly-marked synthetic data so the scanner doesn't block on intentional
+# fixtures, while still catching anything real. Keep the allowlist narrow.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow clearly-marked synthetic test fixtures only"
+paths = [
+  '''systems-under-test/rag/corpus/.*''',
+  '''.*\.example$''',
+  '''.*/fixtures/.*''',
+]
+regexes = [
+  '''SYNTHETIC-TEST-DATA''',
+  '''EXAMPLE''',
+  '''000-00-0000''',
+]

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Pre-commit hook: block any commit that contains a secret.
+# Reconstructs staged content into a temp dir and scans with gitleaks detect,
+# which works even on the first commit. Non-zero exit -> commit aborted.
+set -euo pipefail
+echo "[pre-commit] scanning staged changes for secrets with gitleaks..."
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "[pre-commit] ERROR: gitleaks not installed or not on PATH." >&2
+  echo "[pre-commit] Install it first, or bypass ONCE with --no-verify if certain." >&2
+  exit 1
+fi
+STAGEDIR="$(mktemp -d)"
+trap 'rm -rf "$STAGEDIR"' EXIT
+HAVE_FILES=0
+while IFS= read -r -d '' f; do
+  HAVE_FILES=1
+  mkdir -p "$STAGEDIR/$(dirname "$f")"
+  git show ":$f" > "$STAGEDIR/$f" 2>/dev/null || true
+done < <(git diff --cached --name-only --diff-filter=ACM -z)
+if [ "$HAVE_FILES" -eq 0 ]; then
+  echo "[pre-commit] nothing staged to scan. Proceeding."
+  exit 0
+fi
+CONFIG_ARG=()
+if [ -f ".gitleaks.toml" ]; then CONFIG_ARG=(--config .gitleaks.toml); fi
+if gitleaks detect --source "$STAGEDIR" --no-git --redact "${CONFIG_ARG[@]}"; then
+  echo "[pre-commit] clean — no secrets detected. Proceeding."
+  exit 0
+else
+  echo "" >&2
+  echo "[pre-commit] BLOCKED: a potential secret was found in staged changes." >&2
+  echo "[pre-commit] Remove/replace it, re-stage, and commit again." >&2
+  exit 1
+fi
