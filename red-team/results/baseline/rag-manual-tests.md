@@ -36,9 +36,8 @@ Same poisoned document (vendor_notes.txt) probed three ways:
 Same trap, three phrasings, three different outcomes (benign / quoted / obeyed).
 Attack success is probabilistic and phrasing-dependent. A single manual test
 would have produced a false sense of safety — this is why systematic, automated
-red-teaming (Phase 3) is necessary rather than one-off manual probing.
+red-teaming is necessary rather than one-off manual probing.
 
 ## Baseline status
-These results are the pre-control reference. After guardrails are applied
-(Phase 4), the same queries will be re-run and the change in outcomes recorded
+These results are the pre-control reference. After guardrails are applied, the same queries will be re-run and the change in outcomes recorded
 as the measured risk reduction.
