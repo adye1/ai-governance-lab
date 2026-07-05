@@ -1,0 +1,23 @@
+# Secrets & credentials — NEVER commit
+*.key
+*.pem
+*.env
+.env
+*_token*
+*secret*
+*password*
+credentials*
+# Local model weights & data (too large / not for git)
+*.gguf
+models/
+chroma/
+*.bin
+# The planted-sensitive-data corpus stays LOCAL ONLY
+systems-under-test/rag/corpus/
+# Scan outputs with potentially sensitive detail
+red-team/results/raw/
+# Python / OS cruft
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
